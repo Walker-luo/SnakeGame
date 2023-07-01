@@ -302,6 +302,7 @@ void Game::renderBoards() const
     for (int i = 0; i < this->mWindows.size(); i ++)
     {
         box(this->mWindows[i], 0, 0);
+	wborder(this->mWindows[i], '|', '|', '-', '-', '+', '+', '+', '+');
         wrefresh(this->mWindows[i]);
     }
     this->renderLeaderBoard();
@@ -338,6 +339,7 @@ void Game::runGame()
         this->controlSnake();
         werase(this->mWindows[1]);
 	box(this->mWindows[1], 0, 0);
+	wborder(this->mWindows[1], '|', '|', '-', '-', '+', '+', '+', '+');
 
         bool eatenFood = this->mPtrSnake->moveFoward();
 
