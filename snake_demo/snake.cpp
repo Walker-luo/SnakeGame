@@ -97,14 +97,16 @@ bool Snake::hitSelf()
 bool Snake::touchFood()
 {
     SnakeBody newHead = this->createNewHead();
-    if (this->mFood == newHead)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    if (this->mFood == newHead) return true;
+    else return false;
+}
+
+
+bool Snake::touchAward()
+{
+    SnakeBody newHead = this->createNewHead();
+    if (this->mAward == newHead) return true;
+    else return false;
 }
 
 
@@ -112,6 +114,17 @@ void Snake::senseFood(SnakeBody food)
 {
     this->mFood = food;
 }
+
+void Snake::Awardsense(bool mAwardExist)
+{
+    this->AwardExist = mAwardExist;
+}
+
+void Snake::senseAward(SnakeBody award)
+{
+    this->mAward = award;
+}
+
 
 std::vector<SnakeBody>& Snake::getSnake()
 {
@@ -191,17 +204,25 @@ SnakeBody Snake::createNewHead()
 /*
  * If eat food, return true, otherwise return false
  */
-bool Snake::moveFoward()
+int Snake::moveFoward()
 {
+    if(AwardExist) {
+        if(this->touchAward()) {
+            this->mSnake.insert(this->mSnake.begin(), mAward);
+            this->mSnake.push_back(SnakeTail);
+            return 2;
+        }
+    }
     if(this->touchFood()) {
         this->mSnake.insert(this->mSnake.begin(),mFood);
-        return true;
+        return 1;
     }
     else {
         SnakeBody newHead = this->createNewHead();
+        SnakeTail = mSnake.back();
         this->mSnake.pop_back();
         this->mSnake.insert(this->mSnake.begin(),newHead);
-        return false;
+        return 0;
     }
 }
 

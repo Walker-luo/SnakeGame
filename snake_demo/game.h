@@ -38,8 +38,13 @@ public:
     void renderPoints() const;
     void renderDifficulty() const;
 
-		void createRamdonFood();
-    void renderFood() const;
+    void createRandomFood();
+    void createRandomAward();
+    //create the random food and award;
+    //create award -> return true else false
+    bool createRandom();
+    void renderRandom() const;
+
     void renderSnake() const;
     void controlSnake() const;
 
@@ -61,11 +66,15 @@ private:
     std::vector<WINDOW *> mWindows;
     // Snake information
     const int mInitialSnakeLength = 2;
-    const char mSnakeSymbol = '@';
+    const char mSnakeSymbol = 'o';
     std::unique_ptr<Snake> mPtrSnake;
     // Food information
     SnakeBody mFood;
     const char mFoodSymbol = '#';
+    // Award information
+    SnakeBody mAward;
+    bool mAwardExist;
+    const char mAwardSymbol = '$';
     int mPoints = 0;
     int mDifficulty = 0;
     int mBaseDelay = 100;

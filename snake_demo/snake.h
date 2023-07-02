@@ -36,9 +36,13 @@ public:
     void initializeSnake();
     // Checking API for generating random food
     bool isPartOfSnake(int x, int y);
-    //let the snake where the food is -> to decide whether eat it or not;
+    //let the snake know where the food is -> to decide whether eat it or not;
     void senseFood(SnakeBody food);
     bool touchFood();
+    // let the snake know where the award is -> to decide whether eat it or not;
+    void Awardsense(bool mAwardExist);
+    void senseAward(SnakeBody award);
+    bool touchAward();
     // Check if the snake is dead;
     bool hitWall();
     bool hitSelf();
@@ -49,7 +53,7 @@ public:
     std::vector<SnakeBody>& getSnake();
     int getLength();
     SnakeBody createNewHead();
-    bool moveFoward();
+    int moveFoward();
 
 private:
     const int mGameBoardWidth;
@@ -57,7 +61,10 @@ private:
     // Snake information
     const int mInitialSnakeLength;
     Direction mDirection;
+    SnakeBody SnakeTail;
     SnakeBody mFood;
+    SnakeBody mAward;
+    bool AwardExist;
     std::vector<SnakeBody> mSnake;
 };
 

@@ -24,6 +24,9 @@ Game::Game()
     noecho();
     // No cursor show
     curs_set(0);
+    //start the color
+    start_color();
+    init_pair(1, COLOR_RED, COLOR_BLACK);
     // Get screen and board parameters
     getmaxyx(stdscr, this->mScreenHeight, this->mScreenWidth);
     this->mGameBoardWidth = this->mScreenWidth - this->mInstructionWidth;
@@ -212,16 +215,15 @@ void Game::initializeGame()
 		this->mPtrSnake.reset(new Snake(this->mGameBoardWidth, this->mGameBoardHeight, this->mInitialSnakeLength));
 
 		this->mPoints = 0;
-		this->createRamdonFood();
+		this->createRandomFood();
         this->mPtrSnake->senseFood(mFood);
         this->mDelay = mBaseDelay;
 }
 
-void Game::createRamdonFood()
+void Game::createRandomFood()
 {
     int x, y;
     while(true) {
-        this->mPtrSnake->setRandomSeed();
         x = (rand() % this->mGameBoardWidth) - 1;
         y = (rand() % this->mGameBoardHeight) - 1;
         if(x < 1 || y < 1 || this->mPtrSnake->isPartOfSnake(x,y)) continue;
@@ -232,11 +234,43 @@ void Game::createRamdonFood()
     }
 }
 
-void Game::renderFood() const
+
+void Game::createRandomAward()
+{
+    int x, y;
+    while(true) {
+        x = (rand() % this->mGameBoardWidth) - 1;
+        y = (rand() % this->mGameBoardHeight) - 1;
+        if(x < 1 || y < 1 || this->mPtrSnake->isPartOfSnake(x,y)) continue;
+        this->mAward = SnakeBody(x,y);
+        if(mAward == mFood) continue;
+        break;
+    }
+
+}
+
+
+bool Game::createRandom()
+{
+    this->createRandomFood();
+    if(rand() % 2 == 0) {
+        this->createRandomAward();
+        return true;
+    }
+    else {
+        this->mAwardExist = false;
+        return false;
+    }
+}
+
+void Game::renderRandom() const
 {
     mvwaddch(this->mWindows[1], this->mFood.getY(), this->mFood.getX(), this->mFoodSymbol);
+    if(mAwardExist)
+        mvwaddch(this->mWindows[1], this->mAward.getY(), this->mAward.getX(), this->mAwardSymbol | COLOR_PAIR(1));
     wrefresh(this->mWindows[1]);
 }
+
 
 void Game::renderSnake() const
 {
@@ -322,39 +356,31 @@ void Game::runGame()
 {
     bool moveSuccess;
     int key;
-    while (true)
-    {
-				/* TODO
-				 * this is the main control loop of the game.
-				 * it keeps running a while loop, and does the following things:
-				 * 	1. process your keyboard input
-				 * 	2. clear the window
-				 * 	3. move the current snake forward
-				 * 	4. check if the snake has eaten the food after movement
-				 * 	5. check if the snake dies after the movement
-				 * 	6. make corresponding steps for the ``if conditions'' in 3 and 4.
-				 *   7. render the position of the food and snake in the new frame of window.
-				 *   8. update other game states and refresh the window
-				 */
+    while (true){
         this->controlSnake();
         werase(this->mWindows[1]);
-	box(this->mWindows[1], 0, 0);
-	wborder(this->mWindows[1], '|', '|', '-', '-', '+', '+', '+', '+');
+        box(this->mWindows[1], 0, 0);
+        wborder(this->mWindows[1], '|', '|', '-', '-', '+', '+', '+', '+');
 
-        bool eatenFood = this->mPtrSnake->moveFoward();
+        int eaten = this->mPtrSnake->moveFoward();
 
         this->renderSnake();
-        if(eatenFood) {
-            ++this->mPoints;
-            this->createRamdonFood();
+        if(eaten) {
+            this->mPoints += eaten;
+            this->mAwardExist = this->createRandom();
+            this->mPtrSnake->Awardsense(mAwardExist);
             this->mPtrSnake->senseFood(this->mFood);
+
+            if(this->mAwardExist) {
+                this->mPtrSnake->senseAward(this->mAward);
+            }
             this->adjustDelay();
         }
 
 
         if(this->mPtrSnake->checkCollision()) break;
 
-        this->renderFood();
+        this->renderRandom();
 
         this->renderPoints();
         this->renderDifficulty();
