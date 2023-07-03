@@ -50,6 +50,7 @@ public:
     bool checkCollision();
 
     bool changeDirection(Direction newDirection);
+    Direction getDirection();
     std::vector<SnakeBody>& getSnake();
     int getLength();
     SnakeBody createNewHead();

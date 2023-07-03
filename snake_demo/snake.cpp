@@ -138,18 +138,19 @@ bool Snake::changeDirection(Direction newDirection)
         case Direction::Up:
         {
             if(newDirection != Direction::Down) {
+		if(newDirection == Direction::Up) return true;
                 mDirection = newDirection;
-                return true;
+		break;
             }
             else break;
-
         }
 
         case Direction::Down:
         {
             if(newDirection != Direction::Up) {
+		if(newDirection == Direction::Down) return true;
                 mDirection = newDirection;
-                return true;
+		break;
             }
             else break;
         }
@@ -157,8 +158,9 @@ bool Snake::changeDirection(Direction newDirection)
         case Direction::Left:
         {
             if(newDirection != Direction::Right) {
+		if(newDirection == Direction::Left) return true;
                 mDirection = newDirection;
-                return true;
+		break;
             }
             else break;
         }
@@ -166,6 +168,7 @@ bool Snake::changeDirection(Direction newDirection)
         case Direction::Right:
         {
             if(newDirection != Direction::Left) {
+		if(newDirection == Direction::Right) return true;
                 mDirection = newDirection;
                 break;
             }
@@ -174,6 +177,11 @@ bool Snake::changeDirection(Direction newDirection)
     }
 
     return false;
+}
+
+Direction Snake::getDirection()
+{
+    return mDirection;
 }
 
 

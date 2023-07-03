@@ -218,6 +218,8 @@ void Game::initializeGame()
 		this->createRandomFood();
         this->mPtrSnake->senseFood(mFood);
         this->mDelay = mBaseDelay;
+	this->speed = false;
+	this->speedDelay =mDelay/2;
 }
 
 void Game::createRandomFood()
@@ -283,7 +285,7 @@ void Game::renderSnake() const
     wrefresh(this->mWindows[1]);
 }
 
-void Game::controlSnake() const
+void Game::controlSnake()
 {
     int key;
     key = getch();
@@ -293,28 +295,28 @@ void Game::controlSnake() const
         case 'w':
         case KEY_UP:
         {
-            this->mPtrSnake->changeDirection(Direction::Up);
+            this->speed = this->mPtrSnake->changeDirection(Direction::Up);
             break;
         }
         case 'S':
         case 's':
         case KEY_DOWN:
         {
-            this->mPtrSnake->changeDirection(Direction::Down);
+            this->speed = this->mPtrSnake->changeDirection(Direction::Down);
             break;
         }
         case 'A':
         case 'a':
         case KEY_LEFT:
         {
-            this->mPtrSnake->changeDirection(Direction::Left);
+            this->speed = this->mPtrSnake->changeDirection(Direction::Left);
             break;
         }
         case 'D':
         case 'd':
         case KEY_RIGHT:
         {
-            this->mPtrSnake->changeDirection(Direction::Right);
+            this->speed = this->mPtrSnake->changeDirection(Direction::Right);
             break;
         }
         default:
@@ -349,6 +351,7 @@ void Game::adjustDelay()
     if (mPoints % 5 == 0)
     {
         this->mDelay = this->mBaseDelay * pow(0.75, this->mDifficulty);
+	this->speedDelay = this->mDelay/2;
     }
 }
 
@@ -385,7 +388,8 @@ void Game::runGame()
         this->renderPoints();
         this->renderDifficulty();
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(this->mDelay));
+	if(speed) std::this_thread::sleep_for(std::chrono::milliseconds(this->speedDelay));
+	else std::this_thread::sleep_for(std::chrono::milliseconds(this->mDelay));
 
         refresh();
     }

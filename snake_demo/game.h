@@ -46,7 +46,7 @@ public:
     void renderRandom() const;
 
     void renderSnake() const;
-    void controlSnake() const;
+    void controlSnake();
 
 		void startGame();
     bool renderRestartMenu() const;
@@ -79,6 +79,8 @@ private:
     int mDifficulty = 0;
     int mBaseDelay = 100;
     int mDelay;
+    bool speed;
+    int speedDelay;
     const std::string mRecordBoardFilePath = "record.dat";
     std::vector<int> mLeaderBoard;
     const int mNumLeaders = 3;
