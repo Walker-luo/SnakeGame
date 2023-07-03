@@ -1,7 +1,7 @@
 # SnakeGame(codes are in the master branch) 
 2023夏季学期程设实践大作业
 
-##2023/7/1 - luo
+## 2023/7/1 - luo
 实现框架改变
 
 ## 2023/7/2 - luo
