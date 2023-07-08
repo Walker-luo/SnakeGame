@@ -56,6 +56,8 @@ public:
     SnakeBody getHead();
     SnakeBody createNewHead();
     int moveFoward();
+    	
+    void deletTail();
 
 private:
     const int mGameBoardWidth;

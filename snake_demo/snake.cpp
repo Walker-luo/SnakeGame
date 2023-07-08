@@ -239,6 +239,12 @@ int Snake::moveFoward()
     }
 }
 
+void Snake::deletTail()
+{
+	this->mSnake.pop_back();
+}
+
+
 bool Snake::checkCollision()
 {
     if (this->hitWall() || this->hitSelf())

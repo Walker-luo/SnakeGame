@@ -17,6 +17,7 @@ public:
 
 		void createInformationBoard();
     void renderInformationBoard() const;
+    void renderSpeed() const;
 
     void createGameBoard();
     void renderGameBoard() const;

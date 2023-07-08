@@ -28,6 +28,7 @@ Game::Game()
     start_color();
     init_pair(1, COLOR_RED, COLOR_BLACK);
     init_pair(2, COLOR_GREEN, COLOR_BLACK);
+    init_pair(3, COLOR_BLUE, COLOR_BLACK);
     // Get screen and board parameters
     getmaxyx(stdscr, this->mScreenHeight, this->mScreenWidth);
     this->mGameBoardWidth = this->mScreenWidth - this->mInstructionWidth;
@@ -61,10 +62,18 @@ void Game::renderInformationBoard() const
 {
     mvwprintw(this->mWindows[0], 1, 1, "Welcome to The Snake Game!");
     mvwprintw(this->mWindows[0], 2, 1, "This is a mock version.");
-    mvwprintw(this->mWindows[0], 3, 1, "Be able to change");
-    mvwprintw(this->mWindows[0], 4, 1, "Implemented using C++ and libncurses library.");
+    mvwprintw(this->mWindows[0], 3, 1, "Implemented using C++ and libncurses library.");
+    mvwprintw(this->mWindows[0], 4, 1, "Whether speed or not: ");
 
     wrefresh(this->mWindows[0]);
+}
+
+void Game::renderSpeed() const
+{
+	if(this->speed) mvwaddch(this->mWindows[0], 4, 23, 'Y' | COLOR_PAIR(1) | A_UNDERLINE);
+	else  mvwaddch(this->mWindows[0], 4, 23, 'N' | COLOR_PAIR(3) | A_UNDERLINE);
+	wrefresh(this->mWindows[0]);
+ 
 }
 
 void Game::createGameBoard()
@@ -274,7 +283,7 @@ void Game::renderRandom() const
 {
     mvwaddch(this->mWindows[1], this->mFood.getY(), this->mFood.getX(), this->mFoodSymbol);
     if(mAwardExist)
-        mvwaddch(this->mWindows[1], this->mAward.getY(), this->mAward.getX(), this->mAwardSymbol | COLOR_PAIR(1));
+        mvwaddch(this->mWindows[1], this->mAward.getY(), this->mAward.getX(), this->mAwardSymbol | COLOR_PAIR(2) | A_BLINK);
     wrefresh(this->mWindows[1]);
 }
 
@@ -310,7 +319,7 @@ void Game::renderObstacle()
 {
 	for(int i = 0; i < this->numObstacles; ++i)
 		mvwaddch(this->mWindows[1], this->mObstacles[i].getY(), this->mObstacles[i].getX(), this->mObstacleSymbol
-           | COLOR_PAIR(2));
+           | COLOR_PAIR(1) | A_BOLD | A_STANDOUT);
 	wrefresh(this->mWindows[1]);
 }
 
@@ -318,7 +327,14 @@ bool Game::checkHitObstacle()
 {
 	SnakeBody head = this->mPtrSnake->getHead();
 	for(int i = 0; i < this->numObstacles; ++i){
-		if(this->mObstacles[i] == head) return true;
+		if(this->mObstacles[i] == head) {
+			if(this->speed && this->mPoints) {
+				--this->mPoints;
+				this->mPtrSnake->deletTail();
+				return false;
+			}
+			return true;
+		}
 	}
 
 	return false;
@@ -420,6 +436,7 @@ void Game::runGame()
         int eaten = this->mPtrSnake->moveFoward();
 
         this->renderSnake();
+	this->renderSpeed();
         if(eaten) {
             this->mPoints += eaten;
             this->mAwardExist = this->createRandom();
