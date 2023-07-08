@@ -38,6 +38,14 @@ public:
     void renderPoints() const;
     void renderDifficulty() const;
 
+	//add the random obstacle
+    void addObstacle();
+    void renderObstacle();
+    bool checkHitObstacle();
+    bool isPartOfObstacles(int x, int y);
+
+
+
     void createRandomFood();
     void createRandomAward();
     //create the random food and award;
@@ -53,6 +61,7 @@ public:
     void adjustDelay();
 
 
+
 private:
     // We need to have two windows
     // One is for game introduction
@@ -66,8 +75,12 @@ private:
     std::vector<WINDOW *> mWindows;
     // Snake information
     const int mInitialSnakeLength = 2;
-    const char mSnakeSymbol = 'o';
+    const char mSnakeSymbol = '@';
     std::unique_ptr<Snake> mPtrSnake;
+    //Obstacle information
+    std::vector<SnakeBody> mObstacles;
+    const char mObstacleSymbol = '+';
+    int numObstacles;
     // Food information
     SnakeBody mFood;
     const char mFoodSymbol = '#';

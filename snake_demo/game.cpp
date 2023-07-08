@@ -27,6 +27,7 @@ Game::Game()
     //start the color
     start_color();
     init_pair(1, COLOR_RED, COLOR_BLACK);
+    init_pair(2, COLOR_GREEN, COLOR_BLACK);
     // Get screen and board parameters
     getmaxyx(stdscr, this->mScreenHeight, this->mScreenWidth);
     this->mGameBoardWidth = this->mScreenWidth - this->mInstructionWidth;
@@ -60,8 +61,9 @@ void Game::renderInformationBoard() const
 {
     mvwprintw(this->mWindows[0], 1, 1, "Welcome to The Snake Game!");
     mvwprintw(this->mWindows[0], 2, 1, "This is a mock version.");
-    mvwprintw(this->mWindows[0], 3, 1, "Please fill in the blanks to make it work properly!!");
+    mvwprintw(this->mWindows[0], 3, 1, "Be able to change");
     mvwprintw(this->mWindows[0], 4, 1, "Implemented using C++ and libncurses library.");
+
     wrefresh(this->mWindows[0]);
 }
 
@@ -212,15 +214,20 @@ void Game::renderDifficulty() const
 void Game::initializeGame()
 {
     // allocate memory for a new snake
+        this->mFood = SnakeBody(0,0); // avoid error happens when addObstacle
 		this->mPtrSnake.reset(new Snake(this->mGameBoardWidth, this->mGameBoardHeight, this->mInitialSnakeLength));
-
 		this->mPoints = 0;
+		this->numObstacles = 3;
+		this->mObstacles.clear();
+        this->addObstacle();
 		this->createRandomFood();
         this->mPtrSnake->senseFood(mFood);
         this->mDelay = mBaseDelay;
+
 	this->speed = false;
 	this->speedDelay =mDelay/2;
 }
+
 
 void Game::createRandomFood()
 {
@@ -228,11 +235,9 @@ void Game::createRandomFood()
     while(true) {
         x = (rand() % this->mGameBoardWidth) - 1;
         y = (rand() % this->mGameBoardHeight) - 1;
-        if(x < 1 || y < 1 || this->mPtrSnake->isPartOfSnake(x,y)) continue;
-        else {
-            this->mFood = SnakeBody(x,y);
-            break;
-        }
+        if(x < 1 || y < 1 || this->mPtrSnake->isPartOfSnake(x,y) || this->isPartOfObstacles(x,y)) continue;
+        this->mFood = SnakeBody(x,y);
+        break;
     }
 }
 
@@ -243,7 +248,7 @@ void Game::createRandomAward()
     while(true) {
         x = (rand() % this->mGameBoardWidth) - 1;
         y = (rand() % this->mGameBoardHeight) - 1;
-        if(x < 1 || y < 1 || this->mPtrSnake->isPartOfSnake(x,y)) continue;
+        if(x < 1 || y < 1 || this->mPtrSnake->isPartOfSnake(x,y) || this->isPartOfObstacles(x,y)) continue;
         this->mAward = SnakeBody(x,y);
         if(mAward == mFood) continue;
         break;
@@ -273,6 +278,51 @@ void Game::renderRandom() const
     wrefresh(this->mWindows[1]);
 }
 
+
+void Game::addObstacle()
+{
+    int x, y;
+    SnakeBody obstacle;
+    while(true) {
+        x = (rand() % this->mGameBoardWidth) - 1;
+        y = (rand() % this->mGameBoardHeight) - 1;
+	if(x<1 || y<1 || this->mPtrSnake->isPartOfSnake(x,y)) continue;
+	obstacle = SnakeBody(x,y);
+	if(obstacle == this->mFood) continue;
+	if(this->mAwardExist && obstacle == this->mAward) continue;
+	for(int i = 0; i < mObstacles.size(); ++i) {
+        if(mObstacles[i] == obstacle) continue;
+	}
+    this->mObstacles.push_back(obstacle);
+	if(this->mObstacles.size() == this->numObstacles) break;
+    }
+}
+
+bool Game::isPartOfObstacles(int x, int y)
+{
+    for(SnakeBody cor: this->mObstacles){
+        if(x == cor.getX() && y == cor.getY()) return true;
+    }
+    return false;
+}
+
+void Game::renderObstacle()
+{
+	for(int i = 0; i < this->numObstacles; ++i)
+		mvwaddch(this->mWindows[1], this->mObstacles[i].getY(), this->mObstacles[i].getX(), this->mObstacleSymbol
+           | COLOR_PAIR(2));
+	wrefresh(this->mWindows[1]);
+}
+
+bool Game::checkHitObstacle()
+{
+	SnakeBody head = this->mPtrSnake->getHead();
+	for(int i = 0; i < this->numObstacles; ++i){
+		if(this->mObstacles[i] == head) return true;
+	}
+
+	return false;
+}
 
 void Game::renderSnake() const
 {
@@ -352,6 +402,8 @@ void Game::adjustDelay()
     {
         this->mDelay = this->mBaseDelay * pow(0.75, this->mDifficulty);
 	this->speedDelay = this->mDelay/2;
+	this->numObstacles += 2;
+	this->addObstacle();
     }
 }
 
@@ -382,7 +434,9 @@ void Game::runGame()
 
 
         if(this->mPtrSnake->checkCollision()) break;
+        if(this->checkHitObstacle()) break;
 
+        this->renderObstacle();
         this->renderRandom();
 
         this->renderPoints();

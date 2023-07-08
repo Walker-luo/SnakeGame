@@ -53,6 +53,7 @@ public:
     Direction getDirection();
     std::vector<SnakeBody>& getSnake();
     int getLength();
+    SnakeBody getHead();
     SnakeBody createNewHead();
     int moveFoward();
 

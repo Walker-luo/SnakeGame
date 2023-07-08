@@ -185,6 +185,11 @@ Direction Snake::getDirection()
 }
 
 
+SnakeBody Snake::getHead()
+{
+	return mSnake[0];
+}
+
 SnakeBody Snake::createNewHead()
 {
     int x = mSnake[0].getX();
