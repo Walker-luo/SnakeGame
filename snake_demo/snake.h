@@ -43,6 +43,11 @@ public:
     void Awardsense(bool mAwardExist);
     void senseAward(SnakeBody award);
     bool touchAward();
+    //LifeFruit information
+    void senseLifeFruit(SnakeBody LifeFruit);
+    void LifeFruitsense(bool LifeFruitExist);
+    bool touchLifeFruit();
+    bool WheAddLife();
     // Check if the snake is dead;
     bool hitWall();
     bool hitSelf();
@@ -69,6 +74,11 @@ private:
     SnakeBody mFood;
     SnakeBody mAward;
     bool AwardExist;
+    //Life information
+    SnakeBody mLifeFruit;
+    bool mLifeFruitExist;
+    bool AddLife;
+
     std::vector<SnakeBody> mSnake;
 };
 

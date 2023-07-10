@@ -126,6 +126,25 @@ void Snake::senseAward(SnakeBody award)
 }
 
 
+//Life of Fruit
+void Snake::senseLifeFruit(SnakeBody LifeFruit)
+{
+	this->mLifeFruit = LifeFruit;
+}
+
+void Snake::LifeFruitsense(bool LifeFruitExist)
+{
+	this->mLifeFruitExist = LifeFruitExist;
+}
+	
+bool Snake::touchLifeFruit()
+{
+	SnakeBody newHead = this->createNewHead();
+	if(this->mLifeFruit == newHead) return true;
+	else return false;
+}
+
+
 std::vector<SnakeBody>& Snake::getSnake()
 {
     return this->mSnake;
@@ -223,11 +242,20 @@ int Snake::moveFoward()
         if(this->touchAward()) {
             this->mSnake.insert(this->mSnake.begin(), mAward);
             this->mSnake.push_back(SnakeTail);
+	    this->AddLife = false;
             return 2;
+        }
+    }
+    if(this->mLifeFruitExist) {
+        if(this->touchLifeFruit()) {
+	    this->mSnake.insert(this->mSnake.begin(), mLifeFruit);
+	    this->AddLife = true;
+            return 1;
         }
     }
     if(this->touchFood()) {
         this->mSnake.insert(this->mSnake.begin(),mFood);
+	this->AddLife = false;
         return 1;
     }
     else {
@@ -239,6 +267,11 @@ int Snake::moveFoward()
     }
 }
 
+bool Snake::WheAddLife()
+{
+	return this->AddLife;
+}
+
 void Snake::deletTail()
 {
 	this->mSnake.pop_back();
@@ -247,14 +280,32 @@ void Snake::deletTail()
 
 bool Snake::checkCollision()
 {
-    if (this->hitWall() || this->hitSelf())
-    {
-        return true;
+    if (this->hitSelf()) return true;
+
+    if(this->hitWall()) {
+	    SnakeBody head = this->getHead();
+
+	    if(head.getX() == 0) {
+		    SnakeBody newHead = SnakeBody(this->mGameBoardWidth-2, head.getY());
+		    this->mSnake.insert(this->mSnake.begin(), newHead);
+	    }
+	    else if(head.getX() == this->mGameBoardWidth-1) {
+		    SnakeBody newHead = SnakeBody(1, head.getY());
+		    this->mSnake.insert(this->mSnake.begin(), newHead);
+	    }
+	    else if(head.getY() == 0) {
+		    SnakeBody newHead = SnakeBody(head.getX(),this->mGameBoardHeight-2);
+		    this->mSnake.insert(this->mSnake.begin(), newHead);
+	    }
+	    else if(head.getY() == this->mGameBoardHeight - 1) {
+		    SnakeBody newHead = SnakeBody(head.getX(), 1);
+		    this->mSnake.insert(this->mSnake.begin(), newHead);
+	    }
+
+	    return true;
+		
     }
-    else
-    {
-        return false;
-    }
+
 }
 
 

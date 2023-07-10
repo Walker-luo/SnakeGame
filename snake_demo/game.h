@@ -36,6 +36,7 @@ public:
 
 		void initializeGame();
     void runGame();
+    void renderLife() const;
     void renderPoints() const;
     void renderDifficulty() const;
 
@@ -46,6 +47,8 @@ public:
     bool isPartOfObstacles(int x, int y);
 
 
+    //create the fruit of life
+    void createLifeFruit();
 
     void createRandomFood();
     void createRandomAward();
@@ -89,6 +92,12 @@ private:
     SnakeBody mAward;
     bool mAwardExist;
     const char mAwardSymbol = '$';
+    //Life information
+    int mLife;
+    bool mLifeFruitExist;
+    SnakeBody mLifeFruit;
+    const char mLifeFruitSymbol = '&';
+
     int mPoints = 0;
     int mDifficulty = 0;
     int mBaseDelay = 100;

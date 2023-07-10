@@ -104,8 +104,9 @@ void Game::renderInstructionBoard() const
     mvwprintw(this->mWindows[2], 5, 1, "Left: A");
     mvwprintw(this->mWindows[2], 6, 1, "Right: D");
 
-    mvwprintw(this->mWindows[2], 8, 1, "Difficulty");
+    mvwprintw(this->mWindows[2], 8, 1, "Life");
     mvwprintw(this->mWindows[2], 11, 1, "Points");
+    mvwprintw(this->mWindows[2], 14, 1, "Difficulty");
 
     wrefresh(this->mWindows[2]);
 }
@@ -114,19 +115,19 @@ void Game::renderInstructionBoard() const
 void Game::renderLeaderBoard() const
 {
     // If there is not too much space, skip rendering the leader board
-    if (this->mScreenHeight - this->mInformationHeight - 14 - 2 < 3 * 2)
+    if (this->mScreenHeight - this->mInformationHeight - 18 - 2 < 3 * 2)
     {
         return;
     }
-    mvwprintw(this->mWindows[2], 14, 1, "Leader Board");
+    mvwprintw(this->mWindows[2], 18, 1, "Leader Board");
     std::string pointString;
     std::string rank;
-    for (int i = 0; i < std::min(this->mNumLeaders, this->mScreenHeight - this->mInformationHeight - 14 - 2); i ++)
+    for (int i = 0; i < std::min(this->mNumLeaders, this->mScreenHeight - this->mInformationHeight - 18 - 2); i ++)
     {
         pointString = std::to_string(this->mLeaderBoard[i]);
         rank = "#" + std::to_string(i + 1) + ":";
-        mvwprintw(this->mWindows[2], 14 + (i + 1), 1, rank.c_str());
-        mvwprintw(this->mWindows[2], 14 + (i + 1), 5, pointString.c_str());
+        mvwprintw(this->mWindows[2], 18 + (i + 1), 1, rank.c_str());
+        mvwprintw(this->mWindows[2], 18 + (i + 1), 5, pointString.c_str());
     }
     wrefresh(this->mWindows[2]);
 }
@@ -206,6 +207,13 @@ bool Game::renderRestartMenu() const
 
 }
 
+void Game::renderLife() const
+{
+	std::string Lifesting = std::to_string(this->mLife);
+	mvwprintw(this->mWindows[2], 9, 1, Lifesting.c_str());
+	wrefresh(this->mWindows[2]);
+}
+
 void Game::renderPoints() const
 {
     std::string pointString = std::to_string(this->mPoints);
@@ -216,7 +224,7 @@ void Game::renderPoints() const
 void Game::renderDifficulty() const
 {
     std::string difficultyString = std::to_string(this->mDifficulty);
-    mvwprintw(this->mWindows[2], 9, 1, difficultyString.c_str());
+    mvwprintw(this->mWindows[2], 15, 1, difficultyString.c_str());
     wrefresh(this->mWindows[2]);
 }
 
@@ -226,6 +234,7 @@ void Game::initializeGame()
         this->mFood = SnakeBody(0,0); // avoid error happens when addObstacle
 		this->mPtrSnake.reset(new Snake(this->mGameBoardWidth, this->mGameBoardHeight, this->mInitialSnakeLength));
 		this->mPoints = 0;
+		this->mLife = 2;
 		this->numObstacles = 3;
 		this->mObstacles.clear();
         this->addObstacle();
@@ -266,6 +275,28 @@ void Game::createRandomAward()
 }
 
 
+void Game::createLifeFruit()
+{
+	if(rand() % 2 == 0) this->mLifeFruitExist = true;
+	else { 
+		this->mLifeFruitExist = false;
+		return;
+	}
+    	int x, y;
+    	while(true) {
+        x = (rand() % this->mGameBoardWidth) - 1;
+        y = (rand() % this->mGameBoardHeight) - 1;
+        if(x < 1 || y < 1 || this->mPtrSnake->isPartOfSnake(x,y) || this->isPartOfObstacles(x,y)) continue;
+        this->mLifeFruit = SnakeBody(x,y);
+        if(mLifeFruit == mFood) continue;
+	if(this->mAwardExist && mLifeFruit == this->mAward) continue;
+        break;
+    }
+
+
+}
+
+
 bool Game::createRandom()
 {
     this->createRandomFood();
@@ -283,7 +314,9 @@ void Game::renderRandom() const
 {
     mvwaddch(this->mWindows[1], this->mFood.getY(), this->mFood.getX(), this->mFoodSymbol);
     if(mAwardExist)
-        mvwaddch(this->mWindows[1], this->mAward.getY(), this->mAward.getX(), this->mAwardSymbol | COLOR_PAIR(2) | A_BLINK);
+        mvwaddch(this->mWindows[1], this->mAward.getY(), this->mAward.getX(), this->mAwardSymbol | COLOR_PAIR(2));
+    if(this->mLifeFruitExist)
+	   mvwaddch(this->mWindows[1], this->mLifeFruit.getY(), this->mLifeFruit.getX(), this->mLifeFruitSymbol | COLOR_PAIR(3) | A_BLINK | A_BOLD); 
     wrefresh(this->mWindows[1]);
 }
 
@@ -438,24 +471,32 @@ void Game::runGame()
         this->renderSnake();
 	this->renderSpeed();
         if(eaten) {
+	    if(this->mPtrSnake->WheAddLife()) ++this->mLife;
             this->mPoints += eaten;
             this->mAwardExist = this->createRandom();
+	    this->createLifeFruit();
             this->mPtrSnake->Awardsense(mAwardExist);
             this->mPtrSnake->senseFood(this->mFood);
+	    this->mPtrSnake->LifeFruitsense(this->mLifeFruitExist);
 
             if(this->mAwardExist) {
                 this->mPtrSnake->senseAward(this->mAward);
-            }
+            }	
+	    if(this->mLifeFruitExist)
+		    this->mPtrSnake->senseLifeFruit(this->mLifeFruit);
+
             this->adjustDelay();
         }
 
 
-        if(this->mPtrSnake->checkCollision()) break;
-        if(this->checkHitObstacle()) break;
+        if(this->mPtrSnake->checkCollision()) --this->mLife;
+        if(this->checkHitObstacle()) --this->mLife;
+	if(!this->mLife) break;
 
         this->renderObstacle();
         this->renderRandom();
 
+	this->renderLife();
         this->renderPoints();
         this->renderDifficulty();
 
