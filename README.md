@@ -1,4 +1,5 @@
 # SnakeGame(codes are in the master branch) 
+源代码紧适用于Linux配置好的系统
 
 ## 2023/7/1 - luo
 实现框架改变
