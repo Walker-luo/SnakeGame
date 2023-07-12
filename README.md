@@ -23,7 +23,7 @@
 
 #### 编译环境要求
 
-源代码放于[GitHub](https://github.com/Walker-luo/SnakeGame "SnakeGame"), 主要部分是Windows和Linux分支（main分支主要记录进度）
+源代码放于[GitHub](https://github.com/Walker-luo/SnakeGame "SnakeGame"), 主要部分是Windows和Linux分支
 
 
 提供2种环境的选择（`Windows和Linux`）
