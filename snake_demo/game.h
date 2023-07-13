@@ -1,7 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "curses.h"
+#include <ncurses.h>
 #include <string>
 #include <vector>
 #include <time.h>
