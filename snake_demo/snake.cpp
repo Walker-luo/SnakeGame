@@ -30,10 +30,12 @@ bool SnakeBody::operator == (const SnakeBody& snakeBody)
     return (this->getX() == snakeBody.getX() && this->getY() == snakeBody.getY());
 }
 
-Snake::Snake(int gameBoardWidth, int gameBoardHeight, int initialSnakeLength): mGameBoardWidth(gameBoardWidth), mGameBoardHeight(gameBoardHeight), mInitialSnakeLength(initialSnakeLength)
+Snake::Snake(int gameBoardWidth, int gameBoardHeight, int initialSnakeLength, int num):
+     mGameBoardWidth(gameBoardWidth), mGameBoardHeight(gameBoardHeight), mInitialSnakeLength(initialSnakeLength), numOfSnake(num)
 {
     this->initializeSnake();
     this->setRandomSeed();
+
 }
 
 void Snake::setRandomSeed()
@@ -51,7 +53,7 @@ void Snake::initializeSnake()
 
     for (int i = 0; i < this->mInitialSnakeLength; i ++)
     {
-        this->mSnake.push_back(SnakeBody(centerX, centerY + i));
+        this->mSnake.push_back(SnakeBody(centerX+numOfSnake, centerY + i));
     }
     this->mDirection = Direction::Up;
 }
@@ -136,7 +138,7 @@ void Snake::LifeFruitsense(bool LifeFruitExist)
 {
 	this->mLifeFruitExist = LifeFruitExist;
 }
-	
+
 bool Snake::touchLifeFruit()
 {
 	SnakeBody newHead = this->createNewHead();
@@ -242,7 +244,7 @@ int Snake::moveFoward()
         if(this->touchAward()) {
             this->mSnake.insert(this->mSnake.begin(), mAward);
             this->mSnake.push_back(SnakeTail);
-	    this->AddLife = false;
+            this->AddLife = false;
             return 2;
         }
     }
@@ -255,12 +257,13 @@ int Snake::moveFoward()
     }
     if(this->touchFood()) {
         this->mSnake.insert(this->mSnake.begin(),mFood);
-	this->AddLife = false;
+        this->AddLife = false;
         return 1;
     }
     else {
         SnakeBody newHead = this->createNewHead();
         SnakeTail = mSnake.back();
+        this->AddLife = false;
         this->mSnake.pop_back();
         this->mSnake.insert(this->mSnake.begin(),newHead);
         return 0;
@@ -280,7 +283,9 @@ void Snake::deletTail()
 
 bool Snake::checkCollision()
 {
-    if (this->hitSelf()) return true;
+    if (this->hitSelf()) {
+	    return true;
+    }
 
     if(this->hitWall()) {
 	    SnakeBody head = this->getHead();
@@ -302,10 +307,11 @@ bool Snake::checkCollision()
 		    this->mSnake.insert(this->mSnake.begin(), newHead);
 	    }
 
+        this->mSnake.pop_back();
 	    return true;
-		
-    }
 
+    }
+    return false;
 }
 
 

@@ -29,7 +29,7 @@ class Snake
 {
 public:
     //Snake();
-    Snake(int gameBoardWidth, int gameBoardHeight, int initialSnakeLength);
+    Snake(int gameBoardWidth, int gameBoardHeight, int initialSnakeLength, int num = 1);
     // Set random seed
     void setRandomSeed();
     // Initialize snake
@@ -61,10 +61,11 @@ public:
     SnakeBody getHead();
     SnakeBody createNewHead();
     int moveFoward();
-    	
+
     void deletTail();
 
 private:
+    int numOfSnake;
     const int mGameBoardWidth;
     const int mGameBoardHeight;
     // Snake information
